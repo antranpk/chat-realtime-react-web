@@ -30,7 +30,8 @@ function MessageList({ roomId }) {
 }
 
 function Message({ message, isOwnMessage }) {
-    const { displayName, text } = message;
+    const text = message?.text;
+    const displayName = message?.user?.displayName;
 
     return (
         <li className={['message', isOwnMessage && 'own-message'].join(' ')}>

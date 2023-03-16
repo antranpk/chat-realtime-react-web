@@ -12,6 +12,18 @@ import {
 
 const firebaseConfig = {
     // TODO: Add your Firebase configuration here
+    apiKey: process.env.REACT_APP_API_KEY,
+    authDomain: process.env.REACT_APP_AUTH_DOMAIN,
+    projectId: process.env.REACT_APP_PROJECT_ID,
+    storageBucket: process.env.REACT_APP_STORAGE_BUCKET,
+    messagingSenderId: process.env.REACT_APP_MESSAGING_SENDER_ID,
+    appId: process.env.REACT_APP_APP_ID
+    // apiKey: "AIzaSyA4D6mUpt98kdKtdGy0DqHoY2W09KQI46Y",
+    // authDomain: "chat-app-f401b.firebaseapp.com",
+    // projectId: "chat-app-f401b",
+    // storageBucket: "chat-app-f401b.appspot.com",
+    // messagingSenderId: "1042363916345",
+    // appId: "1:1042363916345:web:28355cda3e23fce360ede8"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -24,7 +36,7 @@ async function loginWithGoogle() {
 
         const { user } = await signInWithPopup(auth, provider);
 
-        return { uid: user.uid, displayName: user.displayName };
+        return { uid: user.uid, displayName: user.displayName, avatar: user.photoURL };
     } catch (error) {
         if (error.code !== 'auth/cancelled-popup-request') {
             console.error(error);
@@ -33,13 +45,14 @@ async function loginWithGoogle() {
     }
 }
 
+//addDoc(collection(db, 'chats', roomId, 'messages'), { timestamp: serverTimestamp(),  text, user });
 async function sendMessage(roomId, user, text) {
     try {
-        await addDoc(collection(db, 'chat-rooms', roomId, 'messages'), {
+        await addDoc(collection(db, 'chats', roomId, 'messages'), {
             uid: user.uid,
-            displayName: user.displayName,
             text: text.trim(),
             timestamp: serverTimestamp(),
+            user
         });
     } catch (error) {
         console.error(error);
@@ -49,7 +62,7 @@ async function sendMessage(roomId, user, text) {
 function getMessages(roomId, callback) {
     return onSnapshot(
         query(
-            collection(db, 'chat-rooms', roomId, 'messages'),
+            collection(db, 'chats', roomId, 'messages'),
             orderBy('timestamp', 'asc')
         ),
         (querySnapshot) => {
